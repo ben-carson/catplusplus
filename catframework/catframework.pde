@@ -35,20 +35,20 @@ void draw() {
     cat.move();
     cat.draw();
   }
-  
+
   float[][] edges = catEdges();
   for (float[] coords : edges) {
     line(coords[0], coords[1], coords[2], coords[3]);
   }
   line.update();
-  
+
   textFont(line.gText,20);
   textAlign(LEFT);
   int i = 0;
   int msggap = 25;
   int top = height-(40 + (25*messages.size()));
   for (String message : messages) {
-    fill((255/max_messages)*(messages.size()-i));  
+    fill((255/max_messages)*(messages.size()-i));
     text(message,20,top+(25*i));
     i++;
   }
@@ -58,7 +58,7 @@ Cat find(String name) {
   Cat result = null;
   for (Cat cat : cats) {
     println("check " + cat.name);
-    if (cat.name.equals(name)) {
+    if (cat.name.toLowerCase().equals(name.toLowerCase())) {
       result = cat;
       break;
     }
@@ -115,7 +115,8 @@ String _cat(String[] tokens) {
   if (tokens.length > 1) {
     String name = tokens[1];
     if (find(name) != null) {
-      result = name + " is already here.";
+      Cat cat = find(name);
+      result = cat.name + " is already here.";
     }
     else {
       cats.add(new Cat(name));
@@ -123,7 +124,7 @@ String _cat(String[] tokens) {
     }
   }
   else {
-    result = "Please give the cat a name";
+    result = "Please give the cat a name.";
   }
   return(result);
 }
@@ -140,24 +141,27 @@ String _coat(String[] tokens) {
     else {
       Cat cat = find(name);
       switch(tokens[2]) {
-      case "tabby": 
+      case "default":
+        cat.loadGif("cat.gif");  // Does not execute
+        break;
+      case "tabby":
         cat.loadGif("cat3.gif");  // Does not execute
-          break;
-        case "siamese": 
-          cat.loadGif("cat2.gif");  // 
-          break;
-        }  
-      result = name + " has a new look.";
-      
+        break;
+      case "siamese":
+        cat.loadGif("cat2.gif");  //
+        break;
+      }
+      result = cat.name + " has a new look.";
+
     }
   }
   else {
-    result = "Please give the cat a name";
+    result = "Please enter a cat's name.";
   }
   return(result);
 }
 
-// change cats coat
+// calls an action
 String _action(String[] tokens) {
   String result = "?";
 
@@ -169,19 +173,34 @@ String _action(String[] tokens) {
     else {
       Cat cat = find(name);
       switch(tokens[2]) {
-      case "eat": 
+      case "eat":
         cat.loadGif("cat-eating.gif");  // Does not execute
-          break;
-        case "fight": 
+        result = cat.name + " is now " + tokens[2] + "ing.";
+        break;
+      case "fight":
         cat.loadGif("cat-fight.gif");  // Does not execute
-          break;
-         }  
-      result = name + "";
-      
+        result = cat.name + " is now " + tokens[2] + "ing.";
+        break;
+      case "heat":
+        cat.loadGif("cat-heat.gif");  // Does not execute
+        result = cat.name + " is now in" + tokens[2];
+        break;
+      case "knead":
+        cat.loadGif("cat-kneading.gif");  // Does not execute
+        result = cat.name + " is now " + tokens[2] + "ing.";
+        break;
+      case "sleep":
+        cat.loadGif("cat-sleeping.gif");  // Does not execute
+        result = cat.name + " is now " + tokens[2] + "ing.";
+        break;
+      default:
+        result = "No matching action found.";
+        break;
+      }
     }
   }
   else {
-    result = "Please give the cat a name";
+    result = "Please enter a cat's name followed by an action.";
   }
   return(result);
 }
@@ -199,7 +218,7 @@ void command(String cmd) {
     case "cat": result = _cat(tokens); break;
     case "coat": result = _coat(tokens); break;
     case "action": result = _action(tokens); break;
-    
+
   }
   messages.add(result);
   if (messages.size() > max_messages) {
